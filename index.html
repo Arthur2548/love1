@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>จดหมายจากอาร์เธอร์ ✉️💖</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { mali: ['Mali', 'sans-serif'] },
+          colors: {
+            brand: {
+              light: '#ffc5d9',
+              dark: '#fce4ec',
+              envelope: '#ff8fab',
+              btn: '#ff6584',
+              text: '#d91a6b',
+              lyric: '#0056b3',
+              lyricMuted: '#ff9fb5',
+              wax: '#b21831'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    audio { display: none; }
+    
+    .envelope-wrapper {
+      position: relative;
+      width: min(90vw, 600px); 
+      height: 300px;
+      background-color: #ff8fab;
+      border-radius: 0 0 15px 15px;
+      cursor: pointer;
+      z-index: 20;
+      transition: transform 0.7s ease;
+    }
+    .flap {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #ff8fab; clip-path: polygon(0 0, 50% 50%, 100% 0);
+      transition: transform 0.4s ease, z-index 0.4s; z-index: 4; transform-origin: top;
+      border-radius: 15px 15px 0 0;
+    }
+
+    .wax-seal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -100%);
+      width: 65px;
+      height: 65px;
+      background: radial-gradient(circle, #e63946 0%, #b21831 100%);
+      border-radius: 50%;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: opacity 0.3s ease, transform 0.4s ease;
+    }
+    .wax-seal::after {
+      content: '❤';
+      color: rgba(255,255,255,0.6);
+      font-size: 34px;
+    }
+
+    .envelope-body {
+      position: absolute; bottom: 0; width: 100%; height: 100%;
+      background-color: #ffb3c6; clip-path: polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%);
+      z-index: 3; border-radius: 0 0 15px 15px;
+    }
+    
+    .letter {
+      position: absolute; bottom: 10px; left: 30px; 
+      width: calc(100% - 60px); 
+      height: 260px;
+      transition: transform 0.7s ease, height 0.7s ease, opacity 0.3s ease; z-index: 1;
+      opacity: 0;
+    }
+
+    .open .flap { transform: rotateX(180deg); z-index: 0; }
+    .open .letter { transform: translateY(-280px); height: 380px; opacity: 1; }
+    .open .wax-seal { opacity: 0; transform: translate(-50%, -200%) scale(0.5); }
+    .open-container { transform: translateY(180px); }
+
+    .floating-heart, .burst-heart {
+      position: absolute; font-size: 26px; z-index: 100; pointer-events: none;
+      user-select: none;
+    }
+    .floating-heart { bottom: -30px; animation: floatUp linear forwards; }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; } 
+      90% { opacity: 1; } 
+      100% { transform: translateY(-120vh) scale(1.5) rotate(25deg); opacity: 0; } 
+    }
+    .burst-heart { animation: burstOut ease-out forwards; }
+    @keyframes burstOut {
+      0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; }
+    }
+
+    #noBtn {
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 110;
+    }
+  </style>
+</head>
+<body class="font-mali bg-gradient-to-b from-brand-light to-brand-dark min-h-screen flex flex-col items-center justify-center overflow-hidden relative p-4">
+
+  <div id="wrapper" class="flex flex-col items-center z-20 transition-transform duration-700">
+    <div id="envelope" class="envelope-wrapper shadow-2xl" onclick="toggleEnvelope()">
+      <div class="flap"></div>
+      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 text-brand-wax/60 font-bold text-base md:text-lg z-10 text-center w-full pointer-events-none">
+        อาร์เธอร์ส่งจดหมายนี้ให้คุณ 💖
+      </div>
+      <div class="wax-seal" id="waxSeal"></div>
+      <div class="letter bg-white/10 backdrop-blur-3xl border border-white/40 shadow-2xl rounded-sm flex flex-col items-center justify-center px-10 overflow-hidden text-center">
+        <div id="lyricsView" class="hidden flex flex-col items-center gap-2 w-full max-w-full">
+            <div id="prevLine" class="text-[0.8rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-nowrap w-full"></div>
+            <div id="currentLine" class="text-[1.1rem] md:text-[1.4rem] text-brand-lyric font-bold leading-tight py-4 whitespace-nowrap w-full drop-shadow-md transition-all duration-300"></div>
+            <div id="nextLine" class="text-[0.8rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-nowrap w-full"></div>
+        </div>
+      </div>
+      <div class="envelope-body"></div>
+    </div>
+    <div id="clickMsg" class="mt-14 text-brand-text font-bold text-2xl animate-pulse text-center drop-shadow-md">
+        กดที่ซอง เพื่อเปิดดูจดหมาย ✉️
+    </div>
+  </div>
+
+  <div id="musicControls" class="fixed bottom-16 hidden flex gap-8 z-50">
+    <button onclick="event.stopPropagation(); skip(-10)" class="bg-brand-btn text-white p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition">⏪</button>
+    <button onclick="event.stopPropagation(); togglePlayManually()" id="playPauseBtn" class="bg-brand-btn text-white p-5 rounded-full shadow-lg hover:scale-110 active:scale-95 transition text-2xl">⏸️</button>
+    <button onclick="event.stopPropagation(); skip(10)" class="bg-brand-btn text-white p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition">⏩</button>
+  </div>
+
+  <div id="finalChoiceOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-4">
+      <h2 class="text-white text-3xl md:text-4xl font-bold mb-16 drop-shadow-lg text-center">เราเป็นแฟนกันนะ?</h2>
+      <div id="btnContainer" class="flex gap-16 items-center justify-center relative w-full h-32">
+          <button id="yesBtn" onclick="acceptLove()" class="bg-brand-btn text-white px-12 py-4 rounded-full text-2xl hover:scale-110 transition shadow-2xl font-bold z-10">เป็น</button>
+          <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="bg-white/20 text-white border border-white/40 px-10 py-3 rounded-full text-xl shadow-lg font-bold">ไม่เป็น</button>
+      </div>
+  </div>
+
+  <footer class="fixed bottom-4 left-0 right-0 text-center z-50">
+    <p class="text-brand-wax/50 text-sm font-bold tracking-wide">จัดทำโดย อาร์เธอร์</p>
+  </footer>
+
+  <audio id="audio" src="mp3.mp3"></audio>
+
+  <script>
+    const audio = document.getElementById('audio');
+    const envelope = document.getElementById('envelope');
+    const wrapper = document.getElementById('wrapper');
+    const lyricsView = document.getElementById('lyricsView');
+    const clickMsg = document.getElementById('clickMsg');
+    const musicControls = document.getElementById('musicControls');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const finalChoiceOverlay = document.getElementById('finalChoiceOverlay');
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    
+    let heartInterval;
+    let isChoiceTriggered = false;
+    let loveAccepted = false;
+    let loopCount = 0; 
+    let hasMoved = false;
+
+    function timeToSec(t) {
+      const p = t.split(':');
+      return parseInt(p[0]) * 60 + parseFloat(p[1]);
+    }
+
+    const lyricsDataRaw = [
+      { time: "00:00", text: "นันนานันนา" }, { time: "00:03", text: "นันนานั้นนานันนา" },
+      { time: "00:06", text: "นานานันนานันนา" }, { time: "00:09", text: "นันนาน้านนานานา" },
+      { time: "00:12", text: "🎵 (ดนตรี) 🎵" }, { time: "00:22", text: "อยู่ตัวคนเดียว ไม่เคยข้องเกี่ยวกับใคร" },
+      { time: "00:27", text: "ก็แสนจะสุขสบายตามใจตัวเองไว้ก่อน" }, { time: "00:33", text: "อยากเที่ยวก็ไป ไม่ไหวก็กลับมานอน" },
+      { time: "00:38", text: "ไม่เคยเป็นเดือดเป็นร้อน จนได้มาพบกับเธอ" }, { time: "00:43", text: "ทำไมไม่รู้แต่รู้ว่าอยากใกล้ชิด" },
+      { time: "00:48", text: "หัวใจมันเริ่มออกฤทธิ์ ชอบคิดอะไรเพ้อเจ้อ" }, { time: "00:54", text: "เพิ่งเจอเมื่อกี้ก็ยังจะโทรถึงเธอ" },
+      { time: "00:58", text: "เข้านอนก็ยังจะเพ้อคิดถึงเเต่เธอเรื่อยไป" }, { time: "01:07", text: "ต้องส่องกระจกแต่เช้าทุกวัน" },
+      { time: "01:12", text: "ยืนหมุนมันอยู่อย่างนั้น เพื่อความมั่นใจ" }, { time: "01:16", text: "ต้องทำตัวเองให้ดูดี ให้เธอชื่นใจ" },
+      { time: "01:23", text: "เป็นอะไรที่มันไม่เคย" }, { time: "01:30", text: "แต่เป็นไปแล้ว แล้วคงจะหยุดไม่ไหว" },
+      { time: "01:35", text: "แล้วเธอหละเคยบ้างไหม " }, { time: "01:37", text: "อาการเหมือนกันไหมเธอ" }, 
+      { time: "01:40", text: "ถ้าหากเธอนั้น ก็เป็นเหมือนกันเสมอ" },
+      { time: "01:45", text: "สรุปว่าฉันกับเธอเราคงต้องเป็นแฟนกัน" },
+      { time: "01:50", text: "🎵 (ดนตรี) 🎵" },
+      { time: "01:54", text: "นันนานันนา" }, { time: "01:56", text: "นันนานั้นนานันนา" },
+      { time: "01:59", text: "นานานันนานันนา" }, { time: "02:01", text: "นันนาน้านนานานา" },
+      { time: "02:05", text: "🎵 (ดนตรี) 🎵" }, { time: "02:28", text: "เพิ่งเจอเมื่อกี้ ก็ยังจะโทรหาเธอ" },
+      { time: "02:33", text: "เข้านอนก็ยังจะเพ้อคิดถึงเรื่องเธออยู่ได้" }, { time: "02:40", text: "ต้องส่องกระจกแต่เช้าทุกวัน" },
+      { time: "02:46", text: "ยืนหมุนมันอยู่อย่างนั้น เพื่อความมั่นใจ" }, { time: "02:50", text: "ต้องทำตัวเองให้ดูดี ให้เธอชื่นใจ" },
+      { time: "02:58", text: "เป็นอะไรที่มันไม่เคย" }, { time: "03:05", text: "แต่เป็นไปแล้ว แล้วคงจะหยุดไม่ไหว" },
+      { time: "03:09", text: "แล้วเธอหละเคยบ้างไหม" }, { time: "03:11", text: "อาการเหมือนกันไหมเธอ" },
+      { time: "03:15", text: "ถ้าหากเธอนั้น ก็เป็นเหมือนกันเสมอ" }, { time: "03:19", text: "สรุปว่าฉันกับเธอเราคงต้องเป็นแฟนกัน" },
+      { time: "03:27", text: "สรุปว่าฉันกับเธอ เฮ้อ..." }, { time: "03:32", text: "เราคงต้องเป็นแฟนกัน 💖" }
+    ];
+
+    const lyricsData = lyricsDataRaw.map(d => ({ time: timeToSec(d.time), text: d.text }));
+
+    function toggleEnvelope() {
+      const isOpen = envelope.classList.contains('open');
+      if (!isOpen) {
+        burstHearts();
+        envelope.classList.add('open');
+        wrapper.classList.add('open-container');
+        clickMsg.style.display = 'none'; 
+        audio.play();
+        setTimeout(() => {
+          lyricsView.classList.remove('hidden');
+          musicControls.classList.remove('hidden');
+          createHearts();
+        }, 700);
+      } else {
+        envelope.classList.remove('open');
+        wrapper.classList.remove('open-container');
+        audio.pause();
+        audio.currentTime = 0; 
+        isChoiceTriggered = false;
+        loveAccepted = false;
+        loopCount = 0; 
+        lyricsView.classList.add('hidden');
+        musicControls.classList.add('hidden');
+        document.getElementById('currentLine').style.color = '';
+        finalChoiceOverlay.classList.add('hidden');
+        clearInterval(heartInterval);
+        heartInterval = null;
+      }
+    }
+
+    function moveButton() {
+        if (!hasMoved) {
+            noBtn.style.position = 'fixed';
+            hasMoved = true;
+        }
+        const padding = 60;
+        const yesRect = yesBtn.getBoundingClientRect();
+        let randomX, randomY, overlap;
+        
+        do {
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+            randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+            
+            overlap = (
+                randomX < yesRect.right + 50 &&
+                randomX + noBtn.offsetWidth > yesRect.left - 50 &&
+                randomY < yesRect.bottom + 50 &&
+                randomY + noBtn.offsetHeight > yesRect.top - 50
+            );
+        } while (overlap);
+        
+        noBtn.style.left = randomX + 'px';
+        noBtn.style.top = randomY + 'px';
+    }
+
+    function acceptLove() {
+        loveAccepted = true; 
+        finalChoiceOverlay.classList.add('hidden');
+        audio.play();
+        document.getElementById('currentLine').style.color = '#ef4444'; 
+        for(let i=0; i<70; i++) setTimeout(createHearts, i * 80);
+    }
+
+    // เมื่อเล่นจนจบไฟล์
+    audio.addEventListener('ended', () => {
+      if (loveAccepted && loopCount < 1) {
+          loopCount++; 
+          audio.currentTime = 199; // กระโดดไป 03:19
+          audio.play();
+      }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      // ตรวจสอบการวนลูป: รอบที่ 2 เมื่อถึง 03:41 (221 วินาที) ให้หยุด
+      if (loopCount === 1 && audio.currentTime >= 221) {
+          audio.pause();
+          audio.currentTime = 221;
+          return;
+      }
+
+      // ระบบคำถาม: จะเด้งเฉพาะเมื่อยังไม่เคยกด "เป็น" เท่านั้น
+      if (!loveAccepted) {
+          if (audio.currentTime < 211.5) { isChoiceTriggered = false; }
+          if (audio.currentTime >= 212 && !isChoiceTriggered) {
+              isChoiceTriggered = true;
+              audio.pause();
+              finalChoiceOverlay.classList.remove('hidden');
+          }
+      }
+
+      let idx = -1;
+      for (let i = 0; i < lyricsData.length; i++) {
+        if (audio.currentTime >= lyricsData[i].time) idx = i;
+        else break;
+      }
+      if (idx !== -1) {
+        document.getElementById('prevLine').innerText = idx > 0 ? lyricsData[idx-1].text : "";
+        document.getElementById('currentLine').innerText = lyricsData[idx].text;
+        document.getElementById('nextLine').innerText = idx < lyricsData.length - 1 ? lyricsData[idx+1].text : "";
+      }
+    });
+
+    function togglePlayManually() {
+      if (audio.paused) { audio.play(); playPauseBtn.innerText = '⏸️'; }
+      else { audio.pause(); playPauseBtn.innerText = '▶️'; }
+    }
+    function skip(s) { audio.currentTime += s; }
+
+    function createHearts() {
+      const heart = document.createElement('div');
+      heart.classList.add('floating-heart');
+      heart.innerText = ['💖', '💗', '💓', '💕', '💘'][Math.floor(Math.random() * 5)];
+      heart.style.left = Math.random() * 100 + 'vw';
+      const dur = Math.random() * 2 + 3;
+      heart.style.animationDuration = dur + 's';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), dur * 1000);
+    }
+
+    function burstHearts() {
+      const rect = envelope.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      for (let i = 0; i < 50; i++) {
+        const h = document.createElement('div');
+        h.classList.add('burst-heart');
+        h.innerText = ['💖', '💗', '💓', '💕', '💘'][Math.floor(Math.random() * 5)];
+        h.style.left = `${x}px`;
+        h.style.top = `${y}px`;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 220 + 180;
+        h.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+        h.style.setProperty('--dy', `${Math.sin(angle) * dist - 180}px`);
+        h.style.animationDuration = (Math.random() * 0.6 + 1) + 's';
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1700);
+      }
+    }
+  </script>
+</body>
+</html>
