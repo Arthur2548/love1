@@ -35,8 +35,8 @@
     
     .envelope-wrapper {
       position: relative;
-      width: min(90vw, 600px); 
-      height: 300px;
+      width: min(95vw, 600px); 
+      height: 280px;
       background-color: #ff8fab;
       border-radius: 0 0 15px 15px;
       cursor: pointer;
@@ -55,8 +55,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -100%);
-      width: 65px;
-      height: 65px;
+      width: 60px;
+      height: 60px;
       background: radial-gradient(circle, #e63946 0%, #b21831 100%);
       border-radius: 50%;
       z-index: 5;
@@ -69,7 +69,7 @@
     .wax-seal::after {
       content: '❤';
       color: rgba(255,255,255,0.6);
-      font-size: 34px;
+      font-size: 32px;
     }
 
     .envelope-body {
@@ -79,9 +79,9 @@
     }
     
     .letter {
-      position: absolute; bottom: 10px; left: 30px; 
-      width: calc(100% - 60px); 
-      height: 260px;
+      position: absolute; bottom: 10px; left: 15px; 
+      width: calc(100% - 30px); 
+      height: 240px;
       transition: transform 0.7s ease, height 0.7s ease, opacity 0.3s ease; z-index: 1;
       opacity: 0;
     }
@@ -89,7 +89,7 @@
     .open .flap { transform: rotateX(180deg); z-index: 0; }
     .open .letter { transform: translateY(-280px); height: 380px; opacity: 1; }
     .open .wax-seal { opacity: 0; transform: translate(-50%, -200%) scale(0.5); }
-    .open-container { transform: translateY(180px); }
+    .open-container { transform: translateY(160px); }
 
     .floating-heart, .burst-heart {
       position: absolute; font-size: 26px; z-index: 100; pointer-events: none;
@@ -116,43 +116,44 @@
 </head>
 <body class="font-mali bg-gradient-to-b from-brand-light to-brand-dark min-h-screen flex flex-col items-center justify-center overflow-hidden relative p-4">
 
-  <div id="wrapper" class="flex flex-col items-center z-20 transition-transform duration-700">
+  <div id="wrapper" class="flex flex-col items-center z-20 transition-transform duration-700 w-full">
     <div id="envelope" class="envelope-wrapper shadow-2xl" onclick="toggleEnvelope()">
       <div class="flap"></div>
-      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 text-brand-wax/60 font-bold text-base md:text-lg z-10 text-center w-full pointer-events-none">
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-brand-wax/60 font-bold text-sm md:text-lg z-10 text-center w-full px-4 pointer-events-none">
         อาร์เธอร์ส่งจดหมายนี้ให้คุณ 💖
       </div>
       <div class="wax-seal" id="waxSeal"></div>
-      <div class="letter bg-white/10 backdrop-blur-3xl border border-white/40 shadow-2xl rounded-sm flex flex-col items-center justify-center px-10 overflow-hidden text-center">
-        <div id="lyricsView" class="hidden flex flex-col items-center gap-2 w-full max-w-full">
-            <div id="prevLine" class="text-[0.8rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-nowrap w-full"></div>
-            <div id="currentLine" class="text-[1.1rem] md:text-[1.4rem] text-brand-lyric font-bold leading-tight py-4 whitespace-nowrap w-full drop-shadow-md transition-all duration-300"></div>
-            <div id="nextLine" class="text-[0.8rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-nowrap w-full"></div>
+      
+      <div class="letter bg-white/10 backdrop-blur-3xl border border-white/40 shadow-2xl rounded-sm flex flex-col items-center justify-center px-6 md:px-10 overflow-hidden text-center">
+        <div id="lyricsView" class="hidden flex flex-col items-center gap-2 w-full">
+            <div id="prevLine" class="text-[0.75rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-normal w-full"></div>
+            <div id="currentLine" class="text-[1rem] md:text-[1.4rem] text-brand-lyric font-bold leading-tight py-2 md:py-4 whitespace-normal w-full drop-shadow-md transition-all duration-300"></div>
+            <div id="nextLine" class="text-[0.75rem] md:text-[0.9rem] text-brand-lyricMuted opacity-70 whitespace-normal w-full"></div>
         </div>
       </div>
       <div class="envelope-body"></div>
     </div>
-    <div id="clickMsg" class="mt-14 text-brand-text font-bold text-2xl animate-pulse text-center drop-shadow-md">
+    <div id="clickMsg" class="mt-14 text-brand-text font-bold text-xl md:text-2xl animate-pulse text-center drop-shadow-md">
         กดที่ซอง เพื่อเปิดดูจดหมาย ✉️
     </div>
   </div>
 
-  <div id="musicControls" class="fixed bottom-16 hidden flex gap-8 z-50">
-    <button onclick="event.stopPropagation(); skip(-10)" class="bg-brand-btn text-white p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition">⏪</button>
-    <button onclick="event.stopPropagation(); togglePlayManually()" id="playPauseBtn" class="bg-brand-btn text-white p-5 rounded-full shadow-lg hover:scale-110 active:scale-95 transition text-2xl">⏸️</button>
-    <button onclick="event.stopPropagation(); skip(10)" class="bg-brand-btn text-white p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition">⏩</button>
+  <div id="musicControls" class="fixed bottom-16 hidden flex gap-4 md:gap-8 z-50">
+    <button onclick="event.stopPropagation(); skip(-10)" class="bg-brand-btn text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition text-sm md:text-base">⏪</button>
+    <button onclick="event.stopPropagation(); togglePlayManually()" id="playPauseBtn" class="bg-brand-btn text-white p-4 md:p-5 rounded-full shadow-lg hover:scale-110 active:scale-95 transition text-xl md:text-2xl">⏸️</button>
+    <button onclick="event.stopPropagation(); skip(10)" class="bg-brand-btn text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition text-sm md:text-base">⏩</button>
   </div>
 
-  <div id="finalChoiceOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-4">
-      <h2 class="text-white text-3xl md:text-4xl font-bold mb-16 drop-shadow-lg text-center">เราเป็นแฟนกันนะ?</h2>
-      <div id="btnContainer" class="flex gap-16 items-center justify-center relative w-full h-32">
-          <button id="yesBtn" onclick="acceptLove()" class="bg-brand-btn text-white px-12 py-4 rounded-full text-2xl hover:scale-110 transition shadow-2xl font-bold z-10">เป็น</button>
-          <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="bg-white/20 text-white border border-white/40 px-10 py-3 rounded-full text-xl shadow-lg font-bold">ไม่เป็น</button>
+  <div id="finalChoiceOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-6 text-center">
+      <h2 class="text-white text-2xl md:text-4xl font-bold mb-12 drop-shadow-lg">เราเป็นแฟนกันนะ?</h2>
+      <div id="btnContainer" class="flex gap-10 md:gap-16 items-center justify-center relative w-full h-32">
+          <button id="yesBtn" onclick="acceptLove()" class="bg-brand-btn text-white px-10 md:px-12 py-3 md:py-4 rounded-full text-xl md:text-2xl hover:scale-110 transition shadow-2xl font-bold z-10">เป็น</button>
+          <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="bg-white/20 text-white border border-white/40 px-8 md:px-10 py-2 md:py-3 rounded-full text-lg md:text-xl shadow-lg font-bold">ไม่เป็น</button>
       </div>
   </div>
 
   <footer class="fixed bottom-4 left-0 right-0 text-center z-50">
-    <p class="text-brand-wax/50 text-sm font-bold tracking-wide">จัดทำโดย อาร์เธอร์</p>
+    <p class="text-brand-wax/50 text-xs md:text-sm font-bold tracking-wide">จัดทำโดย อาร์เธอร์</p>
   </footer>
 
   <audio id="audio" src="mp3.mp3"></audio>
@@ -272,24 +273,21 @@
         for(let i=0; i<70; i++) setTimeout(createHearts, i * 80);
     }
 
-    // เมื่อเล่นจนจบไฟล์
     audio.addEventListener('ended', () => {
       if (loveAccepted && loopCount < 1) {
           loopCount++; 
-          audio.currentTime = 199; // กระโดดไป 03:19
+          audio.currentTime = 199; 
           audio.play();
       }
     });
 
     audio.addEventListener('timeupdate', () => {
-      // ตรวจสอบการวนลูป: รอบที่ 2 เมื่อถึง 03:41 (221 วินาที) ให้หยุด
       if (loopCount === 1 && audio.currentTime >= 221) {
           audio.pause();
           audio.currentTime = 221;
           return;
       }
 
-      // ระบบคำถาม: จะเด้งเฉพาะเมื่อยังไม่เคยกด "เป็น" เท่านั้น
       if (!loveAccepted) {
           if (audio.currentTime < 211.5) { isChoiceTriggered = false; }
           if (audio.currentTime >= 212 && !isChoiceTriggered) {
